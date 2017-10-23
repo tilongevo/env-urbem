@@ -24,6 +24,13 @@ services:
       - globalenv
     network_mode: "bridge"
 
+  postgresql:
+    extends:
+      file: ./etc/postgresql/docker-compose.yml
+      service: postgresql
+    volumes_from:
+      - globalenv
+
   web-urbem:
     build: ./etc/web-php71
     environment:
