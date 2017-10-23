@@ -302,6 +302,42 @@ create_user() {
         ;;
     esac
   fi
+
+  if [[ -n ${DB_DEFAULT_USER} ]]; then
+    case $REPLICATION_MODE in
+      slave|snapshot|backup)
+        echo "INFO! Database user cannot be created on a $REPLICATION_MODE node. Skipping..."
+        ;;
+      *)
+        if [[ -z ${DB_DEFAULT_PASS} ]]; then
+          echo "ERROR! Please specify a password for DB_DEFAULT_USER in DB_DEFAULT_PASS. Exiting..."
+          exit 1
+        fi
+        echo "Creating database user: ${DB_DEFAULT_USER}"
+        if [[ -z $(psql -U ${PG_USER} -Atc "SELECT 1 FROM pg_catalog.pg_user WHERE usename = '${DB_DEFAULT_USER}'";) ]]; then
+          psql -U ${PG_USER} -c "CREATE ROLE \"${DB_DEFAULT_USER}\" with LOGIN CREATEDB PASSWORD '${DB_DEFAULT_PASS}';" >/dev/null
+        fi
+        ;;
+    esac
+  fi
+
+  if [[ -n ${DB_REPORT_USER} ]]; then
+    case $REPLICATION_MODE in
+      slave|snapshot|backup)
+        echo "INFO! Database user cannot be created on a $REPLICATION_MODE node. Skipping..."
+        ;;
+      *)
+        if [[ -z ${DB_REPORT_PASS} ]]; then
+          echo "ERROR! Please specify a password for DB_REPORT_USER in DB_REPORT_PASS. Exiting..."
+          exit 1
+        fi
+        echo "Creating database user: ${DB_REPORT_USER}"
+        if [[ -z $(psql -U ${PG_USER} -Atc "SELECT 1 FROM pg_catalog.pg_user WHERE usename = '${DB_REPORT_USER}'";) ]]; then
+          psql -U ${PG_USER} -c "CREATE ROLE \"${DB_REPORT_USER}\" with LOGIN CREATEDB PASSWORD '${DB_REPORT_PASS}';" >/dev/null
+        fi
+        ;;
+    esac
+  fi
 }
 
 load_extensions() {
@@ -341,6 +377,16 @@ create_database() {
           if [[ -n ${DB_USER} ]]; then
             echo "‣ Granting access to ${DB_USER} user..."
             psql -U ${PG_USER} -c "GRANT ALL PRIVILEGES ON DATABASE \"${database}\" to \"${DB_USER}\";" >/dev/null
+          fi
+
+          if [[ -n ${DB_DEFAULT_USER} ]]; then
+            echo "‣ Granting access to ${DB_DEFAULT_USER} user..."
+            psql -U ${PG_USER} -c "GRANT ALL PRIVILEGES ON DATABASE \"${database}\" to \"${DB_DEFAULT_USER}\";" >/dev/null
+          fi
+
+          if [[ -n ${DB_REPORT_USER} ]]; then
+            echo "‣ Granting access to ${DB_REPORT_USER} user..."
+            psql -U ${PG_USER} -c "GRANT ALL PRIVILEGES ON DATABASE \"${database}\" to \"${DB_REPORT_USER}\";" >/dev/null
           fi
         done
         ;;

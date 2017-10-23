@@ -3,7 +3,8 @@ version: '2.1'
 services:
   postgresql:
     restart: always
-    image: sameersbn/postgresql:9.5-3
+    #image: sameersbn/postgresql:9.5-3
+    build: .
     ports:
       - "5432:5432"
     environment:
@@ -13,6 +14,12 @@ services:
       - DB_PASS=docker
       - DB_NAME=urbem
       - DB_TEMPLATE=template1
+
+      - DB_DEFAULT_USER=urbem
+      - DB_DEFAULT_PASS=urbem
+
+      - DB_REPORT_USER=birt
+      - DB_REPORT_PASS=md517e68e814c79648270e8a9c28b6386e7
 
       - DB_EXTENSION=
 

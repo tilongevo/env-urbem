@@ -10,6 +10,9 @@ var/lib/mongodb/**
 
 # Do not version sites
 var/www/*
+www/urbem-prod/**
+www/transparencia-prod/**
+www/urbem-prod/web/app.php
 
 # Version default site
 !var/www/default

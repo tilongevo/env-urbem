@@ -30,6 +30,7 @@ services:
       service: postgresql
     volumes_from:
       - globalenv
+    network_mode: "bridge"
 
   web-urbem:
     build: ./etc/web-php71
@@ -40,6 +41,7 @@ services:
     network_mode: "bridge"
     links:
       - mysql:mysqlhost
+      - postgresql:postgrehost
     privileged: true
     volumes_from:
       - globalenv
@@ -56,6 +58,7 @@ services:
     network_mode: "bridge"
     links:
       - mysql:mysqlhost
+      - postgresql:postgrehost
     privileged: true
     volumes_from:
       - globalenv

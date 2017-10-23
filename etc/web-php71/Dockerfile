@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y software-properties-common language-pac
 RUN apt-get update && apt-get install -y supervisor
 COPY ./conf/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN apt-get update && apt-get install -y nginx
+RUN apt-get update && apt-get install -y nginx git zip unzip postgresql-contrib
 
 RUN sed -i -e 's/listen = \/run\/php\/php7.1-fpm.sock/listen = 0.0.0.0:9000/g' /etc/php/7.1/fpm/pool.d/www.conf \
     && sed -i -e 's/;daemonize = yes/daemonize = no/g' /etc/php/7.1/fpm/php-fpm.conf
@@ -42,6 +42,9 @@ RUN sed -i -e 's/listen = \/run\/php\/php7.1-fpm.sock/listen = 0.0.0.0:9000/g' /
 # Creates a launcher for wkhtmltopdf under xvfb
 RUN echo 'xvfb-run -- /usr/bin/wkhtmltopdf "${@:-}"' > /usr/local/bin/wkhtmltopdf && \
 	chmod +x /usr/local/bin/wkhtmltopdf
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY ./conf/php/php-cli.ini /etc/php/7.1/cli/php.ini
 COPY ./conf/php/php-fpm.conf /etc/php/7.1/fpm/php-fpm.conf
