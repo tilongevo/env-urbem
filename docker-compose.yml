@@ -1,0 +1,57 @@
+version: "2.1"
+
+services:
+  globalenv:
+    image: debian
+    extends:
+      file: volumes.yml
+      service: globalenv
+    network_mode: "bridge"
+
+  proxy:
+    build: ./etc/proxy
+    volumes:
+        - /var/run/docker.sock:/tmp/docker.sock
+    ports:
+        - "80:80"
+    network_mode: "bridge"
+
+  mysql:
+    extends:
+      file: ./etc/mysql/docker-compose.yml
+      service: mysql
+    volumes_from:
+      - globalenv
+    network_mode: "bridge"
+
+  web-urbem:
+    build: ./etc/web-php71
+    environment:
+      - VIRTUAL_HOST=urbem.prod
+    volumes:
+      - ./etc/web-php71/conf/nginx/urbem.conf:/etc/nginx/conf.d/urbem.conf
+    network_mode: "bridge"
+    links:
+      - mysql:mysqlhost
+    privileged: true
+    volumes_from:
+      - globalenv
+    ports:
+      - "80"
+    entrypoint: /usr/bin/supervisord
+
+  web-transparencia:
+    build: ./etc/web-php56
+    environment:
+      - VIRTUAL_HOST=transparencia.prod
+    volumes:
+      - ./etc/web-php56/conf/nginx/transparencia.conf:/etc/nginx/conf.d/transparencia.conf
+    network_mode: "bridge"
+    links:
+      - mysql:mysqlhost
+    privileged: true
+    volumes_from:
+      - globalenv
+    ports:
+      - "80"
+    entrypoint: /usr/bin/supervisord

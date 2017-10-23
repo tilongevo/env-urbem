@@ -1,0 +1,11 @@
+pentaho:
+  build: .
+  restart: always
+  volumes:
+    - ./kettle:/var/www/pentaho/config
+    - ./pdi:/var/www/pentaho/pdi
+
+  ports:
+    - "8084:8081"
+    - "8085:8082"
+  tty: true

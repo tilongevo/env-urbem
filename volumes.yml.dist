@@ -1,0 +1,7 @@
+version: '2.1'
+
+services:
+    globalenv:
+      volumes:
+        - ./www/urbem-prod:/srv/web/urbem
+        - ./www/transparencia-prod:/srv/web/transparencia
